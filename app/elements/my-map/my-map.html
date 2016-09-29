@@ -1,0 +1,290 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+
+
+<dom-module id="my-map">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      google-map {
+        width: 100%;
+        height: 700px;
+      }
+
+      paper-material div, paper-material h1{
+        margin: 20px;
+      }
+
+    </style>
+
+    <iron-ajax
+    id="ajax"
+    auto
+    url="http://data.sparkfun.com/output/VGxEGjpqrxHaWvDLNLD6.json"
+    handle-as="json"
+    on-response="_onResponse"
+    last-response="{{ajaxResponse}}">
+    </iron-ajax>
+
+    <paper-material elevation="1">
+     <google-map latitude="25.6515697" longitude="-100.2917287">
+        <google-map-marker latitude="{{ranger1Lat}}" longitude="{{ranger1Lon}}" icon="images/touch/red.png"></google-map-marker>
+        <google-map-marker latitude="{{ranger2Lat}}" longitude="{{ranger2Lon}}" icon="images/touch/blue.png"></google-map-marker>
+         <google-map-marker latitude="{{balloon1Lat}}" longitude="{{balloon1Lon}}" icon="images/touch/redBalloon.png"></google-map-marker>
+          <google-map-marker latitude="{{balloon2Lat}}" longitude="{{balloon2Lon}}" icon="images/touch/blueBalloon.png"></google-map-marker>
+      </google-map>
+    </paper-material>
+
+     <paper-material elevation="1">
+        <h1 class="page-title" tabindex="-1">Red Rangers</h1>
+        <div>
+          <span>Time: </span> {{ranger1Time}}
+          <br>
+          <span>Latitude: </span> {{ranger1Lat}}
+          <br>
+          <span>Longitude: </span> {{ranger1Lon}}
+          <br>
+        </div>
+      </paper-material>
+
+      <paper-material elevation="1">
+        <h1 class="page-title" tabindex="-1">Blue Rangers</h1>
+        <div>
+          <span>Time: </span> {{ranger2Time}}
+          <br>
+          <span>Latitude: </span> {{ranger2Lat}}
+          <br>
+          <span>Longitude: </span> {{ranger2Lon}}
+          <br>
+        </div>
+      </paper-material>
+
+      <paper-material elevation="1">
+        <h1 class="page-title" tabindex="-1">Globo A</h1>
+        <div>
+          <span>Time: </span> {{balloon1Time}}
+          <br>
+          <span>Latitude: </span> {{balloon1Lat}}
+          <br>
+          <span>Longitude: </span> {{balloon1Lon}}
+          <br>
+        </div>
+      </paper-material>
+
+      <paper-material elevation="1">
+        <h1 class="page-title" tabindex="-1">Globo B</h1>
+        <div>
+          <span>Time: </span> {{balloon2Time}}
+          <br>
+          <span>Latitude: </span> {{balloon2Lat}}
+          <br>
+          <span>Longitude: </span> {{balloon2Lon}}
+          <br>
+        </div>
+      </paper-material>
+
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'my-map',
+      properties: {
+        foo: {
+          type: String,
+          value: 'my-map',
+          notify: true
+        },
+          ranger1lastUpdate: {
+          type: Date,
+          value: 0,
+          notify: true
+        },
+          ranger1outdatedInfo: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        ranger1Lat: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        ranger1Lon: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        ranger1Time: {
+          type: Date,
+          value: "12:00",
+          notify: true
+        },
+        ranger2lastUpdate: {
+          type: Date,
+          value: 0,
+          notify: true
+        },
+          ranger2outdatedInfo: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        ranger2Lat: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        ranger2Lon: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        ranger2Time: {
+          type: Date,
+          value: "12:00",
+          notify: true
+        },
+        balloon1lastUpdate: {
+          type: Date,
+          value: 0,
+          notify: true
+        },
+          balloon1outdatedInfo: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        balloon1Lat: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        balloon1Lon: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        balloon1Time: {
+          type: Date,
+          value: "12:00",
+          notify: true
+        },
+        balloon2lastUpdate: {
+          type: Date,
+          value: 0,
+          notify: true
+        },
+          balloon2outdatedInfo: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        balloon2Lat: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        balloon2Lon: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        balloon2Time: {
+          type: Date,
+          value: "12:00",
+          notify: true
+        },
+      },
+      _updateData: function() {
+        this.async(function() {
+          this.$.ajax.generateRequest();
+        }, 2000);
+      },
+      _onResponse: function(e, request) {
+        console.log('received response');
+        var sparkfunArray = request.xhr.response;
+        console.log(sparkfunArray);
+
+        var r1 = -1;
+        var r2 = -1;
+        var b1 = -1;
+        var b2 = -1;
+
+        for(var i = 0; i < sparkfunArray.length; i++)
+        {
+            if(b1 == -1 && sparkfunArray[i].id == 1)
+            {
+              b1 = i;
+            }
+
+            if(b2 == -1 && sparkfunArray[i].id == 2)
+            {
+              b2 = i;
+            }
+
+            if(r1 == -1 && sparkfunArray[i].id == 3)
+            {
+              r1 = i;
+            }
+
+            if(r2 == -1 && sparkfunArray[i].id == 4)
+            {
+              r2 = i;
+            }
+
+            if ( b1 == -1 && b2 != -1 && r1 != -1 && r2 != -1)
+              break;
+        }
+
+          if(r1 || r1==0){
+            this.ranger1Lat = sparkfunArray[r1].lat;
+            this.ranger1Lon = sparkfunArray[r1].lon;
+            this.ranger1Time = sparkfunArray[r1].time;
+            this.ranger1lastUpdate = sparkfunArray[r1].timestamp;
+          }
+
+          if(r2 || r2==0){
+            this.ranger2Lat = sparkfunArray[r2].lat;
+            this.ranger2Lon = sparkfunArray[r2].lon;
+            this.ranger2Time = sparkfunArray[r2].time;
+            this.ranger2lastUpdate = sparkfunArray[r2].timestamp;
+          }
+
+          if(b1 || b1==0){
+            this.balloon1Lat = sparkfunArray[b1].lat;
+            this.balloon1Lon = sparkfunArray[b1].lon;
+            this.balloon1Time = sparkfunArray[b1].time;
+            this.balloon1lastUpdate = sparkfunArray[b1].timestamp;
+          }
+
+          if(b2 || b2==0){
+            this.balloon2Lat = sparkfunArray[b2].lat;
+            this.balloon2Lon = sparkfunArray[b2].lon;
+            this.balloon2Time = sparkfunArray[b2].time;
+            this.balloon2lastUpdate = sparkfunArray[b2].timestamp;
+          }
+
+        this._updateData();
+      }
+    });
+  })();
+  </script>
+</dom-module>
